@@ -34,9 +34,12 @@ def apply_migrations(conn: sqlite3.Connection, migrations_dir: Path | str | None
         # Search parent directories for migrations folder
         curr = Path(__file__).resolve()
         for parent in curr.parents:
-            candidate = parent / "migrations"
-            if candidate.exists() and candidate.is_dir():
-                migrations_dir = candidate
+            for dirname in ("migrations", "archived/migrations"):
+                candidate = parent / dirname
+                if candidate.exists() and candidate.is_dir():
+                    migrations_dir = candidate
+                    break
+            if migrations_dir is not None:
                 break
 
     if migrations_dir is None:

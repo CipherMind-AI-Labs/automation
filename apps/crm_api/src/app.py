@@ -4,6 +4,7 @@ import json
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
+import secrets
 from typing import Any
 
 from dotenv import load_dotenv
@@ -25,6 +26,7 @@ from src.repositories.opportunity_repository import OpportunityRepository
 from src.repositories.product_assessment_repository import ProductAssessmentRepository
 from src.repositories.research_profile_repository import ResearchProfileRepository
 from src.repositories.research_source_repository import ResearchSourceRepository
+from src.routes.auth_routes import AuthRoutes
 from src.routes.communication_routes import CommunicationRoutes
 from src.routes.company_routes import CompanyRoutes
 from src.routes.contact_routes import ContactRoutes
@@ -39,7 +41,23 @@ from src.services.follow_up_reminder_service import FollowUpReminderService
 from src.services.opportunity_service import OpportunityService
 from src.services.research_profile_service import ResearchProfileService
 from src.utils.logger import log_info
-from src.utils.response import success_response
+from src.utils.response import error_response, success_response
+
+
+def validate_token(authorization_header: str | None) -> bool:
+    """Validate Bearer token against CRM_ACCESS_TOKEN using constant-time comparison.
+
+    Args:
+        authorization_header: Authorization HTTP header string.
+
+    Returns:
+        True if token matches CRM_ACCESS_TOKEN, False otherwise.
+    """
+    if not authorization_header or not authorization_header.startswith("Bearer "):
+        return False
+    token = authorization_header[7:].strip()
+    expected_token = os.environ.get("CRM_ACCESS_TOKEN", "dev_access_token_123")
+    return secrets.compare_digest(token, expected_token)
 
 
 class CRMApp:
@@ -79,6 +97,7 @@ class CRMApp:
 
         # Router & Routes
         self.router = Router()
+        AuthRoutes().register(self.router)
         CompanyRoutes(self.company_service).register(self.router)
         ResearchProfileRoutes(self.research_profile_service).register(self.router)
         OpportunityRoutes(self.opportunity_service).register(self.router)
@@ -105,6 +124,15 @@ class CRMApp:
 
         if method == "GET" and (url.endswith("/health") or path == "/health"):
             return self.health()
+
+        # Enforce authentication for all non-health data endpoints
+        auth_header = (
+            getattr(request, "authorization", None)
+            or getattr(request, "headers", {}).get("authorization")
+            or getattr(request, "headers", {}).get("Authorization")
+        )
+        if not validate_token(auth_header):
+            return error_response("unauthorized", status_code=401, details="Invalid or missing access token.")
 
         payload: dict[str, Any] | None = None
         if hasattr(request, "json"):
@@ -145,10 +173,18 @@ class _RequestAdapter:
     ``.json()`` — this class satisfies that interface.
     """
 
-    def __init__(self, url: str, method: str, body: dict[str, Any] | None) -> None:
+    def __init__(
+        self,
+        url: str,
+        method: str,
+        body: dict[str, Any] | None,
+        headers: dict[str, str] | None = None,
+    ) -> None:
         self.url = url
         self.method = method
         self._body = body
+        self.headers = headers or {}
+        self.authorization = self.headers.get("authorization") or self.headers.get("Authorization")
 
     def json(self) -> dict[str, Any] | None:  # noqa: D102
         """Return the pre-parsed request body (or None for bodyless requests)."""
@@ -200,9 +236,12 @@ async def _lifespan(application: FastAPI):  # type: ignore[type-arg]
 
 app = FastAPI(title="CRM API", version="1.0.0", lifespan=_lifespan)
 
+allowed_origins_raw = os.environ.get("ALLOWED_ORIGINS", "*")
+allowed_origins = [origin.strip() for origin in allowed_origins_raw.split(",") if origin.strip()]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -237,10 +276,12 @@ async def handle_all(request: Request, path: str) -> JSONResponse:  # noqa: ARG0
         except Exception:
             body = None
 
+    headers_dict = dict(request.headers)
     mock_req = _RequestAdapter(
         url=str(request.url),
         method=request.method,
         body=body,
+        headers=headers_dict,
     )
     crm = create_app(database=_build_db_adapter())
     res = crm.handle_request(mock_req)
@@ -249,3 +290,4 @@ async def handle_all(request: Request, path: str) -> JSONResponse:  # noqa: ARG0
         content=res.get("body", {}),
         status_code=res.get("status", 200),
     )
+

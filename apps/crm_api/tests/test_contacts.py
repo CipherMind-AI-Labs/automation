@@ -3,10 +3,11 @@ from src.database.sqlite_adapter import get_test_database_adapter
 
 
 class FakeRequest:
-    def __init__(self, method, url, body=None):
+    def __init__(self, method, url, body=None, authorization="Bearer dev_access_token_123"):
         self.method = method
         self.url = url
         self._body = body or {}
+        self.authorization = authorization
 
     def json(self):
         return self._body

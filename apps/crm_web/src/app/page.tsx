@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { AuthScreen } from "@/components/AuthScreen";
 import { DashboardOverview } from "@/components/DashboardOverview";
 import { LeadDetailPanel } from "@/components/LeadDetailPanel";
 import { LeadForm } from "@/components/LeadForm";
 import { LeadTable } from "@/components/LeadTable";
 import styles from "@/components/crm.module.css";
-import { ApiError, crmApi } from "@/lib/api";
+import { ApiError, crmApi, getStoredToken, setStoredToken, setUnauthorizedHandler } from "@/lib/api";
 import type { FullResearchProfile, LeadDraft, LeadRecord, Opportunity } from "@/lib/types";
 
 const initialLoadError = "We couldn’t load the CRM data. Check that the API is running and try again.";
@@ -64,6 +65,10 @@ async function loadData() {
 
 /** Provides the complete operational CRM workspace. */
 export default function HomePage(): React.JSX.Element {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [isVerifyingToken, setIsVerifyingToken] = useState(false);
+
   const [leads, setLeads] = useState<LeadRecord[]>([]);
   const [selectedLead, setSelectedLead] = useState<LeadRecord | null>(null);
   const [editingLead, setEditingLead] = useState<LeadRecord | null | undefined>(undefined);
@@ -90,8 +95,44 @@ export default function HomePage(): React.JSX.Element {
   };
 
   useEffect(() => {
-    void refresh();
+    setUnauthorizedHandler(() => {
+      setIsAuthenticated(false);
+      setAuthError("Session expired or invalid access token.");
+    });
+
+    const initAuth = async () => {
+      const storedToken = getStoredToken();
+      if (!storedToken) {
+        setIsAuthenticated(false);
+        return;
+      }
+      const isValid = await crmApi.verifyToken(storedToken);
+      if (isValid) {
+        setIsAuthenticated(true);
+        void refresh();
+      } else {
+        setIsAuthenticated(false);
+      }
+    };
+
+    void initAuth();
   }, []);
+
+  const handleAuthenticate = async (token: string): Promise<boolean> => {
+    setIsVerifyingToken(true);
+    setAuthError(null);
+    const isValid = await crmApi.verifyToken(token);
+    setIsVerifyingToken(false);
+    if (isValid) {
+      setStoredToken(token);
+      setIsAuthenticated(true);
+      void refresh();
+      return true;
+    } else {
+      setAuthError("Invalid access token. Please check your token and try again.");
+      return false;
+    }
+  };
 
   const stages = useMemo(
     () => Array.from(new Set(leads.map((lead) => lead.opportunity.lead_status || "New"))).sort(),
@@ -305,6 +346,26 @@ export default function HomePage(): React.JSX.Element {
       setIsSaving(false);
     }
   };
+
+  if (isAuthenticated === null) {
+    return (
+      <main className={styles.authShell}>
+        <div className={styles.emptyState}>
+          <strong>Checking Authentication Session…</strong>
+        </div>
+      </main>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return (
+      <AuthScreen
+        onAuthenticate={handleAuthenticate}
+        isVerifying={isVerifyingToken}
+        error={authError}
+      />
+    );
+  }
 
   return (
     <main className={styles.appShell}>

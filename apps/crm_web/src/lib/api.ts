@@ -2,17 +2,57 @@ import { invalidateCachedValue, readCachedValue, writeCachedValue } from "@/lib/
 import type { Communication, Company, CommunicationThread, Contact, FullResearchProfile, Opportunity, Reminder } from "@/lib/types";
 
 const PAGE_SIZE = 500;
+const TOKEN_KEY = "crm_access_token";
+
+let unauthorizedHandler: (() => void) | null = null;
+
+export function getStoredToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(TOKEN_KEY);
+}
+
+export function setStoredToken(token: string): void {
+  if (typeof window !== "undefined") {
+    localStorage.setItem(TOKEN_KEY, token);
+  }
+}
+
+export function clearStoredToken(): void {
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(TOKEN_KEY);
+  }
+}
+
+export function setUnauthorizedHandler(handler: () => void): void {
+  unauthorizedHandler = handler;
+}
 
 /** Error returned when the CRM API rejects a request. */
 export class ApiError extends Error {}
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
+  const token = getStoredToken();
+  const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
+
   const response = await fetch(path, {
     ...options,
-    headers: { "Content-Type": "application/json", ...options?.headers },
+    headers: {
+      "Content-Type": "application/json",
+      ...authHeaders,
+      ...options?.headers,
+    },
   });
+
+  if (response.status === 401) {
+    clearStoredToken();
+    if (unauthorizedHandler) {
+      unauthorizedHandler();
+    }
+    throw new ApiError("Session expired or invalid access token.");
+  }
+
   if (response.status === 204) return undefined as T;
-  const body = await response.json() as T | { error?: string; details?: string };
+  const body = (await response.json()) as T | { error?: string; details?: string };
   if (!response.ok) {
     const error = body as { error?: string; details?: string };
     throw new ApiError(error.details ?? error.error ?? "The CRM API request failed.");
@@ -31,6 +71,18 @@ async function getReferenceData<T>(key: string, path: string): Promise<T> {
 const jsonRequest = <T>(method: string, body: T): RequestInit => ({ method, body: JSON.stringify(body) });
 
 export const crmApi = {
+  verifyToken: async (token?: string): Promise<boolean> => {
+    const targetToken = token ?? getStoredToken();
+    if (!targetToken) return false;
+    try {
+      await request<{ status: string; authenticated: boolean }>("/api/auth/verify", {
+        headers: { Authorization: `Bearer ${targetToken}` },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  },
   listCompanies: () => getReferenceData<Company[]>("companies", `/api/companies?limit=${PAGE_SIZE}`),
   listContacts: () => getReferenceData<Contact[]>("contacts", `/api/contacts?limit=${PAGE_SIZE}`),
   listOpportunities: () => request<Opportunity[]>(`/api/opportunities?limit=${PAGE_SIZE}`),
@@ -67,3 +119,4 @@ export const crmApi = {
   createThread: (data: Partial<CommunicationThread>) => request<CommunicationThread>("/api/communication-threads", jsonRequest("POST", data)),
   createCommunication: (data: Partial<Communication>) => request<Communication>("/api/communications", jsonRequest("POST", data)),
 };
+
