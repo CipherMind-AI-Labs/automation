@@ -16,3 +16,4 @@ node_modules/
 .idea/inspectionProfiles/profiles_settings.xml
 .idea/automation.iml
 .idea/.name
+.idea/workspace.xml
