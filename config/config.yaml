@@ -1,0 +1,38 @@
+llm:
+  provider: ollama
+  model: qwen3:4b
+  base_url: http://localhost:11434
+  temperature: 0.2
+  max_tokens: 4096
+  timeout: 120
+  context_window: 4096
+icp:
+  target:
+    business_types:
+      - dealer
+    industries:
+      - contract furniture
+    countries:
+      - United States
+    states: []
+  manufacturers:
+    required:
+      - Kimball
+    excluded: []
+  digital:
+    product_catalog:
+      required: false
+    ecommerce:
+      allowed: false
+  company:
+    min_employee_count:
+    max_employee_count:
+    min_revenue:
+    max_revenue:
+  website:
+    required: true
+    language: en
+  exclusions:
+    keywords:
+      - retail
+      - residential

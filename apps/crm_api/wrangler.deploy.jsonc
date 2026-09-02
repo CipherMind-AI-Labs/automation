@@ -1,0 +1,14 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "crm-api",
+  "main": "src/app.py",
+  "compatibility_date": "2026-08-07",
+  "compatibility_flags": ["python_workers"],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "crm",
+      "database_id": "0cac78e6-df35-47ff-84e8-555e88788993"
+    }
+  ]
+}

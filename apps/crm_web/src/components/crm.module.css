@@ -1,0 +1,117 @@
+.appShell { max-width: 1600px; margin: 0 auto; padding: 32px 42px; }
+.header { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 24px; padding-bottom: 16px; border-bottom: 1px solid #eaecf0; }
+.brandGroup { display: flex; align-items: center; gap: 16px; }
+.brandLogo { height: 44px; width: auto; object-fit: contain; }
+.brandInfo { display: flex; flex-direction: column; justify-content: center; }
+.header h1, .panelHeader h2 { margin: 2px 0; color: #10213d; letter-spacing: -0.035em; }
+.header h1 { font-size: 26px; font-weight: 800; }
+.eyebrow { margin: 0; color: #0284c7; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+
+.primaryButton, .secondaryButton, .iconButton, .outlineButton { border: 0; border-radius: 8px; font-weight: 700; cursor: pointer; transition: all 0.15s ease; }
+.primaryButton { padding: 10px 18px; color: white; background: #0284c7; box-shadow: 0 1px 2px rgb(2 132 199 / 20%); }
+.primaryButton:hover { background: #0369a1; }
+.primaryButton:disabled { cursor: not-allowed; opacity: .65; }
+.secondaryButton { padding: 10px 16px; background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.secondaryButton:hover { background: #dcfce7; }
+.outlineButton { padding: 8px 14px; background: white; color: #0284c7; border: 1px solid #bae6fd; font-size: 13px; }
+.outlineButton:hover { background: #f0f9ff; border-color: #0284c7; }
+.iconButton { display: grid; width: 32px; height: 32px; place-items: center; background: transparent; color: #667085; font-size: 24px; line-height: 1; }
+
+.overview { display: flex; overflow: auto; margin-bottom: 20px; border: 1px solid #e4e7ec; border-radius: 12px; background: white; }
+.overviewTotal, .overviewItem { min-width: 132px; padding: 16px 22px; border-right: 1px solid #e4e7ec; }
+.overview span { display: block; color: #667085; font-size: 12px; }
+.overview strong { display: block; margin-top: 4px; color: #10213d; font-size: 24px; }
+.overviewTotal { background: #f0f9ff; }
+.attentionCard { background: #fff8eb; }
+
+/* Main Workspace Split View */
+.workspace { display: flex; height: calc(100vh - 240px); min-height: 550px; border: 1px solid #e4e7ec; border-radius: 12px; background: white; box-shadow: 0 1px 2px rgb(16 24 40 / 4%); overflow: hidden; }
+
+/* Item 1: Internal Vertical Scroll for Table */
+.listArea { min-width: 0; flex: 1; display: flex; flex-direction: column; height: 100%; }
+.toolbar { display: flex; align-items: flex-end; gap: 14px; padding: 16px 18px; border-bottom: 1px solid #e4e7ec; flex-shrink: 0; background: #fff; }
+.searchLabel { flex: 1; }
+.filterLabel { width: 145px; }
+.toolbar label span { display: block; margin-bottom: 5px; color: #475467; font-size: 12px; font-weight: 700; }
+.toolbar input, .toolbar select, .formContent input, .formContent select, .formContent textarea, .commForm input, .commForm select, .commForm textarea { width: 100%; padding: 9px 10px; border: 1px solid #d0d5dd; border-radius: 7px; outline: none; color: #1d2939; background: white; }
+.toolbar input:focus, .toolbar select:focus, .formContent input:focus, .formContent select:focus, .formContent textarea:focus { border-color: #0284c7; box-shadow: 0 0 0 3px rgb(2 132 199 / 12%); }
+.resultCount { padding: 10px 0; color: #667085; white-space: nowrap; }
+
+.tableWrap { flex: 1; overflow-y: auto; overflow-x: auto; position: relative; }
+.leadTable { width: 100%; min-width: 900px; border-collapse: collapse; }
+.leadTable th { position: sticky; top: 0; z-index: 2; padding: 12px 16px; color: #667085; background: #fafbfc; font-size: 11px; letter-spacing: .04em; text-align: left; text-transform: uppercase; border-bottom: 1px solid #eaecf0; }
+.leadTable td { padding: 14px 16px; border-top: 1px solid #eaecf0; vertical-align: middle; }
+.leadTable tbody tr { cursor: pointer; transition: background .15s; }
+.leadTable tbody tr:hover, .selectedRow { background: #f0f9ff; }
+.cellSubtext { display: block; max-width: 180px; overflow: hidden; color: #667085; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.muted { color: #98a2b3; }
+.statusBadge { display: inline-block; padding: 4px 8px; border-radius: 20px; color: #344054; background: #f2f4f7; font-size: 12px; font-weight: 700; }
+.statusnew { color: #0284c7; background: #f0f9ff; }
+.statusqualified, .statuswon { color: #067647; background: #ecfdf3; }
+.statuscontacted, .statusproposal-sent, .statusnegotiation { color: #b54708; background: #fffaeb; }
+.statuslost { color: #b42318; background: #fef3f2; }
+.followUp { display: inline-block; font-size: 12px; font-weight: 700; }
+.overdue { color: #b42318; }
+.today { color: #b54708; }
+.upcoming { color: #0284c7; }
+.emptyState { display: flex; height: 100%; flex-direction: column; align-items: center; justify-content: center; gap: 6px; color: #667085; padding: 40px; }
+.emptyState strong { color: #344054; font-size: 16px; }
+.errorBanner { display: flex; justify-content: space-between; gap: 16px; margin: 16px; padding: 12px; border-radius: 8px; color: #b42318; background: #fef3f2; }
+.errorBanner button { border: 0; color: #b42318; background: transparent; font-weight: 700; cursor: pointer; }
+
+/* Item 2: Internal Vertical Scroll for Lead Detail Sidebar */
+.detailPanel { width: 420px; flex: 0 0 420px; border-left: 1px solid #e4e7ec; background: #fcfcfd; display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.panelHeader { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 22px; border-bottom: 1px solid #e4e7ec; flex-shrink: 0; background: white; }
+.panelHeader h2 { font-size: 20px; }
+.detailContent { flex: 1; overflow-y: auto; display: grid; gap: 20px; padding: 22px; align-content: start; }
+.detailContent h3 { margin: 0 0 9px; color: #344054; font-size: 13px; font-weight: 700; }
+.detailContent p { margin: 0; color: #475467; line-height: 1.5; font-size: 13px; }
+.followUpCard { padding: 14px; border: 1px solid #bae6fd; border-radius: 8px; background: #f0f9ff; }
+.followUpCard > span { display: block; margin-bottom: 5px; color: #0369a1; font-size: 12px; font-weight: 700; }
+.followUpCard p { margin-top: 8px; font-size: 12px; }
+.detailsList { margin: 0; }
+.detailsList div { display: grid; grid-template-columns: 110px 1fr; gap: 8px; padding: 7px 0; border-bottom: 1px solid #eaecf0; font-size: 12px; }
+.detailsList dt { color: #667085; font-weight: 600; }
+.detailsList dd { margin: 0; color: #344054; overflow-wrap: anywhere; }
+
+.sectionHeader { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+
+/* Item 6: Communication Form & List */
+.commForm { display: grid; gap: 10px; padding: 14px; border: 1px solid #e4e7ec; border-radius: 8px; background: white; margin-bottom: 12px; }
+.commFormGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.commForm label { font-size: 11px; font-weight: 700; color: #475467; display: grid; gap: 3px; }
+.timeline { display: grid; gap: 10px; }
+.message { padding: 12px; border: 1px solid #eaecf0; border-radius: 8px; background: white; }
+.message > div { display: flex; justify-content: space-between; gap: 8px; margin-bottom: 6px; }
+.message time { color: #98a2b3; font-size: 11px; }
+.message strong { display: block; color: #344054; font-size: 13px; }
+.message p { margin-top: 5px; font-size: 12px; }
+.inbound, .outbound { font-size: 11px; font-weight: 700; padding: 2px 6px; border-radius: 4px; }
+.inbound { color: #067647; background: #ecfdf3; }
+.outbound { color: #0284c7; background: #f0f9ff; }
+.preserve { white-space: pre-wrap; }
+
+/* Item 7 & User Additions: Modals */
+.modalBackdrop { position: fixed; z-index: 100; inset: 0; display: grid; place-items: center; padding: 20px; background: rgb(16 24 40 / 50%); backdrop-filter: blur(2px); }
+.formModal { display: flex; width: min(720px, 100%); max-height: calc(100vh - 40px); flex-direction: column; border-radius: 12px; background: white; box-shadow: 0 20px 40px rgb(16 24 40 / 25%); overflow: hidden; }
+.formContent { display: grid; gap: 20px; overflow-y: auto; padding: 22px; }
+.formContent fieldset { display: grid; gap: 12px; margin: 0; padding: 16px; border: 1px solid #e4e7ec; border-radius: 9px; }
+.formContent legend { padding: 0 6px; color: #0284c7; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
+.formContent label { display: grid; gap: 5px; color: #475467; font-size: 12px; font-weight: 700; }
+.formContent textarea { resize: vertical; }
+.formGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.formActions { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 22px; border-top: 1px solid #e4e7ec; background: #fafbfc; }
+
+/* Analysis Modal */
+.analysisModal { display: flex; width: min(840px, 100%); max-height: calc(100vh - 60px); flex-direction: column; border-radius: 12px; background: white; box-shadow: 0 24px 48px rgb(16 24 40 / 30%); overflow: hidden; }
+.analysisContent { flex: 1; overflow-y: auto; padding: 24px; display: grid; gap: 24px; }
+.analysisSection { padding: 18px; border: 1px solid #e4e7ec; border-radius: 10px; background: #fafbfc; }
+.analysisSection h4 { margin: 0 0 12px; color: #0284c7; font-size: 14px; font-weight: 700; border-bottom: 1px solid #e4e7ec; padding-bottom: 6px; }
+.analysisGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.analysisItem { display: grid; gap: 2px; }
+.analysisItem label { font-size: 11px; font-weight: 700; color: #667085; text-transform: uppercase; }
+.analysisItem span { font-size: 13px; color: #1d2939; overflow-wrap: anywhere; }
+
+@media (max-width: 1050px) { .appShell { padding: 24px; }.detailPanel { width: 340px; flex-basis: 340px; } }
+@media (max-width: 800px) { .appShell { padding: 16px; }.header { align-items: flex-start; flex-direction: column; }.workspace { display: block; height: auto; min-height: 0; }.detailPanel { width: 100%; border-top: 1px solid #e4e7ec; border-left: 0; height: auto; }.toolbar { align-items: stretch; flex-wrap: wrap; }.searchLabel { flex-basis: 100%; }.resultCount { display: none; } }
+@media (max-width: 500px) { .formGrid, .commFormGrid, .analysisGrid { grid-template-columns: 1fr; }.overviewTotal, .overviewItem { min-width: 112px; padding: 12px; } }
