@@ -1,0 +1,41 @@
+==============================================================================
+                    AUTOMATION PLATFORM - RUN COMMANDS
+==============================================================================
+
+------------------------------------------------------------------------------
+1. BACKEND SERVER (CRM API - FastAPI + D1 REST API)
+------------------------------------------------------------------------------
+Run from repository root (automation/):
+
+Command (Option A - Standard Uvicorn):
+  .venv\Scripts\uvicorn src.app:app --app-dir apps/crm_api --port 8787 --reload
+
+Command (Option B - FastAPI CLI):
+  .venv\Scripts\fastapi dev apps/crm_api/src/app.py --port 8787
+
+Backend URLs:
+  - API Root:           http://127.0.0.1:8787
+  - Interactive Docs:   http://127.0.0.1:8787/docs
+  - Health Check:       http://127.0.0.1:8787/health
+
+------------------------------------------------------------------------------
+2. FRONTEND APPLICATION (CRM Web - Next.js)
+------------------------------------------------------------------------------
+Run from frontend directory (apps/crm_web/):
+
+Command:
+  cd apps/crm_web
+  npm run dev
+
+Frontend URL:
+  - Local App:          http://localhost:3000
+
+------------------------------------------------------------------------------
+3. TESTING ENDPOINTS DIRECTLY (PowerShell / CMD)
+------------------------------------------------------------------------------
+Test API health:
+  curl http://127.0.0.1:8787/health
+
+Test Companies API:
+  curl http://127.0.0.1:8787/api/companies
+==============================================================================

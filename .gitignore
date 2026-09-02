@@ -1,0 +1,11 @@
+apps/crm_api/.env
+*.pyc
+/archived
+/apps/agents
+.idea/.env.env.example
+apps/crm_api/.env.example
+apps/crm_web/.env.example
+node_modules/
+.next/
+.env.local
+*.tsbuildinfo

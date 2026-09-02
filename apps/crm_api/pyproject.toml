@@ -1,0 +1,21 @@
+[project]
+name = "crm-api"
+version = "0.1.0"
+description = "CRM API — FastAPI server backed by Cloudflare D1 REST API"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi[standard]",
+    "uvicorn[standard]",
+    "httpx",
+    "python-dotenv",
+]
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+]
+
+# Note: dependencies are installed into the root automation/.venv.
+# From the automation/ root run:
+#   uv pip install --python .venv "fastapi[standard]" "uvicorn[standard]" httpx python-dotenv
